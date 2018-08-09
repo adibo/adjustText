@@ -26,10 +26,10 @@ def get_midpoint(bbox):
     return cx, cy
 
 def get_points_inside_bbox(x, y, bbox):
-    """Return the indices of points inside the given bbox."""
+    """Return the indices of points inside the given bbox, including edges."""
     x1, y1, x2, y2 = bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax
-    x_in = np.logical_and(x>x1, x<x2)
-    y_in = np.logical_and(y>y1, y<y2)
+    x_in = np.logical_and(x >= x1, x <= x2)
+    y_in = np.logical_and(y >= y1, y <= y2)
     return np.asarray(np.nonzero(x_in & y_in)[0])
 
 def get_renderer(fig):
@@ -180,8 +180,9 @@ def repel_text(texts, renderer=None, ax=None, expand=(1.2, 1.2),
     overlap_directions_x = np.zeros_like(overlaps_x)
     overlap_directions_y = np.zeros_like(overlaps_y)
     for i, bbox1 in enumerate(bboxes):
-        overlaps = get_points_inside_bbox(xmins*2+xmaxs*2, (ymins+ymaxs)*2,
-                                             bbox1) % len(bboxes)
+        overlaps = get_points_inside_bbox((xmins+xmaxs)*2,
+                                          (ymins+ymaxs)*2,
+                                          bbox1) % len(bboxes)
         overlaps = np.unique(overlaps)
         for j in overlaps:
             bbox2 = bboxes[j]
